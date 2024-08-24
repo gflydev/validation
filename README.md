@@ -13,14 +13,14 @@ Quick usage
 ```go
 import "github.com/gflydev/validation"
 
-if errorData, err := validation.Validate(loginDto, validation.MsgForTag); err != nil {
+if errorData, err := validation.Check(loginDto, validation.MsgForTag); err != nil {
     return c.BadRequest(errorData)
 }
 ```
 
 Customize error message by yourself
 ```go
-if errorData, err := validation.ValidateData(loginDto, func(fe validator.FieldError) string {
+if errorData, err := validation.CheckData(loginDto, func(fe validator.FieldError) string {
     switch fe.Tag() {
     case "required":
         return "This field is required"
@@ -46,26 +46,26 @@ Review and add more code in file `message_for_tag.go`.
 package validation
 
 import (
-	"github.com/go-playground/validator/v10"
-	"github.com/google/uuid"
+    "github.com/go-playground/validator/v10"
+    "github.com/google/uuid"
 )
 
 // UuidRule Custom validation for uuid fields. Use `validate:"uuid"`
 type UuidRule string
 
 func (v UuidRule) GetTag() string {
-	return string(v)
+    return string(v)
 }
 
 func (v UuidRule) Handler() validator.Func {
-	return func(fl validator.FieldLevel) bool {
-		field := fl.Field().String()
+    return func(fl validator.FieldLevel) bool {
+        field := fl.Field().String()
 
-		if _, err := uuid.Parse(field); err != nil {
-			return false
-		}
-		return true
-	}
+        if _, err := uuid.Parse(field); err != nil {
+            return false
+        }
+        return true
+    }
 }
 ```
 Add rule to validator
