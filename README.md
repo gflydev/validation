@@ -1,26 +1,26 @@
 # Validation
 
-By default, data checking is supported for structs by `ValidateStruct(structData interface{}, msgForTag MsgForTagFunc) (map[string][]string, error)`
+By default, data checking is supported for structs by `Check(structData any, msgForTag MsgForTagFunc) (map[string]any, error)`
 
 ### Usage
 
 Install
 ```bash
-go get -u github.com/gflydev/validation@v1.0.0
+go get -u github.com/gflydev/validation@v1.0.3
 ```
 
 Quick usage
 ```go
 import "github.com/gflydev/validation"
 
-if errorData, err := validation.Check(loginDto, validation.MsgForTag); err != nil {
+if errorData, err := validation.Check(loginDto); err != nil {
     return c.BadRequest(errorData)
 }
 ```
 
 Customize error message by yourself
 ```go
-if errorData, err := validation.CheckData(loginDto, func(fe validator.FieldError) string {
+if errorData, err := validation.Check(loginDto, func(fe validator.FieldError) string {
     switch fe.Tag() {
     case "required":
         return "This field is required"

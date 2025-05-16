@@ -2,6 +2,7 @@ package validation
 
 import (
 	goerrors "errors"
+	"github.com/gflydev/core"
 	"github.com/go-playground/validator/v10"
 	"reflect"
 	"strings"
@@ -22,8 +23,8 @@ type ICustomValidator interface {
 }
 
 // AddRule append a custom validator
-func AddRule(validator ICustomValidator) {
-	customValidators = append(customValidators, validator)
+func AddRule(validatorObj ICustomValidator) {
+	customValidators = append(customValidators, validatorObj)
 }
 
 // instance A singleton Validator instance.
@@ -36,7 +37,7 @@ func ValidatorInstance() *validator.Validate {
 	}
 
 	// Create a new validator for a Book model.
-	instance := validator.New()
+	instance = validator.New()
 
 	// Custom validation for myType fields. Use `validate:"myType"`
 	for _, validatorObj := range customValidators {
@@ -62,9 +63,9 @@ func ValidatorInstance() *validator.Validate {
 // ===========================================================================================================
 
 // CheckData verify a data struct type.
-func CheckData(structData interface{}, msgForTag MsgForTagFunc) (map[string][]string, error) {
+func checkData(structData any, msgForTag MsgForTagFunc) (core.Data, error) {
 	validatorInstance := ValidatorInstance()
-	var out map[string][]string
+	var out core.Data
 
 	// Validate data
 	err := validatorInstance.Struct(structData)
@@ -72,12 +73,15 @@ func CheckData(structData interface{}, msgForTag MsgForTagFunc) (map[string][]st
 		// Determine error type ValidationErrors.
 		var ve validator.ValidationErrors
 		if goerrors.As(err, &ve) {
-			out = make(map[string][]string, len(ve))
-			// Parse error to build custom message
+			out = make(core.Data, len(ve))
+			// Parse error to build a custom message
 			for _, fe := range ve {
-				messages := out[fe.Field()]
+				// Get list message of specific field
+				messages, _ := out[fe.Field()].([]string)
+				// Get new message related field
 				message := msgForTag(fe)
 
+				// Append a new message and assign to pool
 				out[fe.Field()] = append(messages, message)
 			}
 		}
@@ -87,7 +91,7 @@ func CheckData(structData interface{}, msgForTag MsgForTagFunc) (map[string][]st
 }
 
 // Check Validate data struct type.
-func Check(structData interface{}, msgForTagFunc ...MsgForTagFunc) (map[string][]string, error) {
+func Check(structData any, msgForTagFunc ...MsgForTagFunc) (core.Data, error) {
 	// Default message tag function.
 	fn := MsgForTag
 
@@ -95,5 +99,5 @@ func Check(structData interface{}, msgForTagFunc ...MsgForTagFunc) (map[string][
 		fn = msgForTagFunc[0]
 	}
 
-	return CheckData(structData, fn)
+	return checkData(structData, fn)
 }
