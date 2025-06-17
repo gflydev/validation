@@ -49,11 +49,11 @@ type TestStructForMsg struct {
 	EqualField       string `json:"equal_field" validate:"eqfield=Name"`
 	NotEqualField    string `json:"not_equal_field" validate:"nefield=Name"`
 	// Additional fields for more validation tags
-	//EqualIgnoreCase    string `json:"equal_ignore_case" validate:"eq_ignore_case=TEST"`
+	// EqualIgnoreCase    string `json:"equal_ignore_case" validate:"eq_ignore_case=TEST"`
 	GreaterThan      string `json:"greater_than" validate:"gt=5"`
 	GreaterThanEqual string `json:"greater_than_equal" validate:"gte=5"`
-	//LessThan           string `json:"less_than" validate:"lt=5"`
-	//LessThanEqual      string `json:"less_than_equal" validate:"lte=5"`
+	// LessThan           string `json:"less_than" validate:"lt=5"`
+	// LessThanEqual      string `json:"less_than_equal" validate:"lte=5"`
 	NotEqual           string `json:"not_equal" validate:"ne=test"`
 	NotEqualIgnoreCase string `json:"not_equal_ignore_case" validate:"ne_ignore_case=TEST"`
 	AlphaUnicode       string `json:"alpha_unicode" validate:"alphaunicode"`
@@ -76,7 +76,7 @@ type TestStructForMsg struct {
 	BTCAddrBech32      string `json:"btc_addr_bech32" validate:"btc_addr_bech32"`
 	MongoDB            string `json:"mongodb" validate:"mongodb"`
 	Cron               string `json:"cron" validate:"cron"`
-	//SpiceDB                    string `json:"spicedb" validate:"spicedb"`
+	// SpiceDB                    string `json:"spicedb" validate:"spicedb"`
 	DateTime                   string `json:"datetime" validate:"datetime"`
 	E164                       string `json:"e164" validate:"e164"`
 	EthAddr                    string `json:"eth_addr" validate:"eth_addr"`
@@ -137,7 +137,7 @@ type TestStructForMsg struct {
 	CIDRv6                     string `json:"cidrv6" validate:"cidrv6"`
 	DataURI                    string `json:"data_uri" validate:"datauri"`
 	HostnamePort               string `json:"hostname_port" validate:"hostname_port"`
-	//HostnameRFC1123            string `json:"hostname_rfc1123" validate:"hostname_rfc1123"`
+	// HostnameRFC1123            string `json:"hostname_rfc1123" validate:"hostname_rfc1123"`
 	IP4Addr  string `json:"ip4_addr" validate:"ip4_addr"`
 	IP6Addr  string `json:"ip6_addr" validate:"ip6_addr"`
 	IPAddr   string `json:"ip_addr" validate:"ip_addr"`
@@ -147,28 +147,28 @@ type TestStructForMsg struct {
 	UDP4Addr string `json:"udp4_addr" validate:"udp4_addr"`
 	UDP6Addr string `json:"udp6_addr" validate:"udp6_addr"`
 	UDPAddr  string `json:"udp_addr" validate:"udp_addr"`
-	//UnixAddr           string `json:"unix_addr" validate:"unix_addr"`
+	// UnixAddr           string `json:"unix_addr" validate:"unix_addr"`
 	URI     string `json:"uri" validate:"uri"`
 	HTTPURL string `json:"http_url" validate:"http_url"`
-	//URLEncoded         string `json:"url_encoded" validate:"url_encoded"`
+	// URLEncoded         string `json:"url_encoded" validate:"url_encoded"`
 	URNRFC2141 string `json:"urn_rfc2141" validate:"urn_rfc2141"`
 	Dir        string `json:"dir" validate:"dir"`
 	DirPath    string `json:"dir_path" validate:"dirpath"`
 	File       string `json:"file" validate:"file"`
-	//FilePath           string `json:"file_path" validate:"filepath"`
+	// FilePath           string `json:"file_path" validate:"filepath"`
 	Image          string `json:"image" validate:"image"`
 	IsDefault      string `json:"is_default" validate:"isdefault"`
 	RequiredIf     string `json:"required_if" validate:"required_if"`
 	RequiredUnless string `json:"required_unless" validate:"required_unless"`
-	//RequiredWith       string `json:"required_with" validate:"required_with"`
+	// RequiredWith       string `json:"required_with" validate:"required_with"`
 	RequiredWithAll    string `json:"required_with_all" validate:"required_with_all"`
 	RequiredWithout    string `json:"required_without" validate:"required_without"`
 	RequiredWithoutAll string `json:"required_without_all" validate:"required_without_all"`
 	ExcludedIf         string `json:"excluded_if" validate:"excluded_if"`
-	//ExcludedUnless     string `json:"excluded_unless" validate:"excluded_unless"`
-	//ExcludedWith       string `json:"excluded_with" validate:"excluded_with"`
+	// ExcludedUnless     string `json:"excluded_unless" validate:"excluded_unless"`
+	// ExcludedWith       string `json:"excluded_with" validate:"excluded_with"`
 	ExcludedWithAll string `json:"excluded_with_all" validate:"excluded_with_all"`
-	//ExcludedWithout    string `json:"excluded_without" validate:"excluded_without"`
+	// ExcludedWithout    string `json:"excluded_without" validate:"excluded_without"`
 	ExcludedWithoutAll string `json:"excluded_without_all" validate:"excluded_without_all"`
 	IsColor            string `json:"is_color" validate:"iscolor"`
 	CountryCode        string `json:"country_code" validate:"country_code"`
@@ -583,7 +583,7 @@ func TestMsgForTag(t *testing.T) {
 			expectedError: "field does not equal another field Name",
 		},
 		// Additional test cases for more validation tags
-		//{
+		// {
 		//	name: "EqualIgnoreCase validation",
 		//	data: TestStructForMsg{
 		//		Name:            "John Doe",
@@ -593,7 +593,7 @@ func TestMsgForTag(t *testing.T) {
 		//	},
 		//	fieldName:     "EqualIgnoreCase",
 		//	expectedError: "equal ignoring case TEST",
-		//},
+		// },
 		{
 			name: "GreaterThan validation",
 			data: TestStructForMsg{
@@ -616,7 +616,7 @@ func TestMsgForTag(t *testing.T) {
 			fieldName:     "GreaterThanEqual",
 			expectedError: "greater than or equal 5",
 		},
-		//{
+		// {
 		//	name: "LessThan validation",
 		//	data: TestStructForMsg{
 		//		Name:     "John Doe",
@@ -626,8 +626,8 @@ func TestMsgForTag(t *testing.T) {
 		//	},
 		//	fieldName:     "LessThan",
 		//	expectedError: "less than 5",
-		//},
-		//{
+		// },
+		// {
 		//	name: "LessThanEqual validation",
 		//	data: TestStructForMsg{
 		//		Name:          "John Doe",
@@ -637,7 +637,7 @@ func TestMsgForTag(t *testing.T) {
 		//	},
 		//	fieldName:     "LessThanEqual",
 		//	expectedError: "less than or equal 5",
-		//},
+		// },
 		{
 			name: "NotEqual validation",
 			data: TestStructForMsg{
@@ -880,7 +880,7 @@ func TestMsgForTag(t *testing.T) {
 			fieldName:     "Cron",
 			expectedError: "invalid cron",
 		},
-		//{
+		// {
 		//	name: "SpiceDB validation",
 		//	data: TestStructForMsg{
 		//		Name:    "John Doe",
@@ -890,7 +890,7 @@ func TestMsgForTag(t *testing.T) {
 		//	},
 		//	fieldName:     "SpiceDB",
 		//	expectedError: "invalid SpiceDb ObjectID/Permission/Type",
-		//},
+		// },
 		{
 			name: "DateTime validation",
 			data: TestStructForMsg{
@@ -1419,7 +1419,7 @@ func TestMsgForTag(t *testing.T) {
 			fieldName:     "FieldContains",
 			expectedError: "field contains test",
 		},
-		//{
+		// {
 		//	name: "FieldExcludes validation",
 		//	data: TestStructForMsg{
 		//		Name:          "John Doe",
@@ -1429,7 +1429,7 @@ func TestMsgForTag(t *testing.T) {
 		//	},
 		//	fieldName:     "FieldExcludes",
 		//	expectedError: "field excludes content test",
-		//},
+		// },
 		{
 			name: "GtCSField validation",
 			data: TestStructForMsg{
@@ -1551,7 +1551,7 @@ func TestMsgForTag(t *testing.T) {
 			fieldName:     "HostnamePort",
 			expectedError: "invalid HostPort",
 		},
-		//{
+		// {
 		//	name: "HostnameRFC1123 validation",
 		//	data: TestStructForMsg{
 		//		Name:            "John Doe",
@@ -1561,7 +1561,7 @@ func TestMsgForTag(t *testing.T) {
 		//	},
 		//	fieldName:     "HostnameRFC1123",
 		//	expectedError: "invalid Hostname RFC 1123",
-		//},
+		// },
 		{
 			name: "IP4Addr validation",
 			data: TestStructForMsg{
@@ -1661,7 +1661,7 @@ func TestMsgForTag(t *testing.T) {
 			fieldName:     "UDPAddr",
 			expectedError: "invalid User Datagram Protocol Address UDP",
 		},
-		//{
+		// {
 		//	name: "UnixAddr validation",
 		//	data: TestStructForMsg{
 		//		Name:     "John Doe",
@@ -1671,7 +1671,7 @@ func TestMsgForTag(t *testing.T) {
 		//	},
 		//	fieldName:     "UnixAddr",
 		//	expectedError: "invalid Unix domain socket end point Address",
-		//},
+		// },
 		{
 			name: "URI validation",
 			data: TestStructForMsg{
@@ -1694,7 +1694,7 @@ func TestMsgForTag(t *testing.T) {
 			fieldName:     "HTTPURL",
 			expectedError: "invalid HTTP URL string",
 		},
-		//{
+		// {
 		//	name: "URLEncoded validation",
 		//	data: TestStructForMsg{
 		//		Name:       "John Doe",
@@ -1704,7 +1704,7 @@ func TestMsgForTag(t *testing.T) {
 		//	},
 		//	fieldName:     "URLEncoded",
 		//	expectedError: "invalid URL encoded",
-		//},
+		// },
 		{
 			name: "URNRFC2141 validation",
 			data: TestStructForMsg{
@@ -1749,7 +1749,7 @@ func TestMsgForTag(t *testing.T) {
 			fieldName:     "File",
 			expectedError: "existing file",
 		},
-		//{
+		// {
 		//	name: "FilePath validation",
 		//	data: TestStructForMsg{
 		//		Name:     "John Doe",
@@ -1759,7 +1759,7 @@ func TestMsgForTag(t *testing.T) {
 		//	},
 		//	fieldName:     "FilePath",
 		//	expectedError: "invalid file path",
-		//},
+		// },
 		{
 			name: "Image validation",
 			data: TestStructForMsg{
@@ -1804,7 +1804,7 @@ func TestMsgForTag(t *testing.T) {
 			fieldName:     "RequiredUnless",
 			expectedError: "required unless",
 		},
-		//{
+		// {
 		//	name: "RequiredWith validation",
 		//	data: TestStructForMsg{
 		//		Name:         "John Doe",
@@ -1814,7 +1814,7 @@ func TestMsgForTag(t *testing.T) {
 		//	},
 		//	fieldName:     "RequiredWith",
 		//	expectedError: "required with",
-		//},
+		// },
 		{
 			name: "RequiredWithAll validation",
 			data: TestStructForMsg{
@@ -1859,7 +1859,7 @@ func TestMsgForTag(t *testing.T) {
 			fieldName:     "ExcludedIf",
 			expectedError: "excluded if",
 		},
-		//{
+		// {
 		//	name: "ExcludedUnless validation",
 		//	data: TestStructForMsg{
 		//		Name:           "John Doe",
@@ -1869,8 +1869,8 @@ func TestMsgForTag(t *testing.T) {
 		//	},
 		//	fieldName:     "ExcludedUnless",
 		//	expectedError: "excluded unless",
-		//},
-		//{
+		// },
+		// {
 		//	name: "ExcludedWith validation",
 		//	data: TestStructForMsg{
 		//		Name:         "John Doe",
@@ -1880,7 +1880,7 @@ func TestMsgForTag(t *testing.T) {
 		//	},
 		//	fieldName:     "ExcludedWith",
 		//	expectedError: "excluded with",
-		//},
+		// },
 		{
 			name: "ExcludedWithAll validation",
 			data: TestStructForMsg{
@@ -1892,7 +1892,7 @@ func TestMsgForTag(t *testing.T) {
 			fieldName:     "ExcludedWithAll",
 			expectedError: "excluded with all",
 		},
-		//{
+		// {
 		//	name: "ExcludedWithout validation",
 		//	data: TestStructForMsg{
 		//		Name:            "John Doe",
@@ -1902,7 +1902,7 @@ func TestMsgForTag(t *testing.T) {
 		//	},
 		//	fieldName:     "ExcludedWithout",
 		//	expectedError: "excluded without",
-		//},
+		// },
 		{
 			name: "ExcludedWithoutAll validation",
 			data: TestStructForMsg{
@@ -2039,7 +2039,7 @@ func (m MockFieldError) Error() string {
 	return m.errMsg
 }
 
-func (m MockFieldError) Translate(ut ut.Translator) string {
+func (m MockFieldError) Translate(utr ut.Translator) string {
 	return ""
 }
 

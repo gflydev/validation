@@ -339,6 +339,8 @@ func MsgForTag(fe validator.FieldError) string {
 		return "color format hexcolor|rgb|rgba|hsl|hsla"
 	case "country_code":
 		return "country format iso3166_1_alpha2|iso3166_1_alpha3|iso3166_1_alpha_numeric"
+	case "db_exists":
+		return fmt.Sprintf("value does not exist in `%s`", fe.Param())
 	}
 
 	return fe.Error() // default error
