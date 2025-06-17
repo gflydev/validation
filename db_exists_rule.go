@@ -1,3 +1,5 @@
+// Package validation provides custom validation rules for database-related checks.
+// It includes functionality to validate the existence of values in database tables.
 package validation
 
 import (
@@ -9,7 +11,20 @@ import (
 	"strings"
 )
 
+// TagExists is the default validation tag name for the database existence check.
+// It can be used in struct field tags as `validate:"db_exists=table.column"`.
 const TagExists ExistsRule = "db_exists"
+
+// The struct to get output of a query
+// result represents the output of an EXISTS database query.
+// The Exists field indicates whether the queried value was found in the database.
+type result struct {
+	Exists bool `db:"exists"`
+}
+
+// Db is a global database instance obtained from the mb package.
+// It provides access to the database connection for executing queries.
+var db = mb.Instance()
 
 // Initialize the validator
 func init() {
@@ -24,10 +39,18 @@ func ExistsValidator(tag ...string) ExistsRule {
 	return TagExists
 }
 
-// ExistsRule Custom validation for checking if a value exists in a database table
-// Use `validate:"db:exists:table=column"` where:
-// - table: the name of the table to check
-// - column: the name of the column to check against
+// ExistsRule is a custom validation rule for checking if a value exists in a database table.
+// It supports three validation patterns:
+//   - `validate:"db_exists=table.column"` - checks if a single value exists in the table
+//   - `validate:"db_exists=all:table.column"` - checks if all array values exist in the table
+//   - `validate:"db_exists=one:table.column"` - checks if at least one array value exists in the table
+//
+// Parameters:
+//   - table: the name of the database table to check
+//   - column: the name of the column to check against
+//
+// The rule supports validation of single values and arrays/slices of basic types
+// (string, int, uint, float, bool).
 type ExistsRule string
 
 func (v ExistsRule) GetTag() string {
@@ -36,12 +59,20 @@ func (v ExistsRule) GetTag() string {
 
 func (v ExistsRule) Handler() validator.Func {
 	return func(fl validator.FieldLevel) bool {
-		db := mb.Instance()
-
 		// The value of a field and parameter to check
 		field := fl.Field()
 		// The tag parameter: db:exists=table.column => table.column
 		param := fl.Param()
+
+		// Determine validation mode (default, all, one)
+		mode := "default"
+		if strings.HasPrefix(param, "all:") {
+			mode = "all"
+			param = param[4:] // Remove "all:" prefix
+		} else if strings.HasPrefix(param, "one:") {
+			mode = "one"
+			param = param[4:] // Remove "one:" prefix
+		}
 
 		// Parse the parameter to get table and column
 		parts := strings.Split(param, ".")
@@ -58,41 +89,104 @@ func (v ExistsRule) Handler() validator.Func {
 			return false
 		}
 
-		// Convert field value to string based on type
-		var value interface{}
-		switch field.Kind() {
-		case reflect.String:
-			value = field.String()
-		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-			value = field.Int()
-		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-			value = field.Uint()
-		case reflect.Float32, reflect.Float64:
-			value = field.Float()
-		case reflect.Bool:
-			value = field.Bool()
-		default:
-			return false
-		}
-
-		// The struct to get output of query
-		type result struct {
-			Exists bool `db:"exists"`
-		}
-
 		// Get placeholder from default dialect:
 		//	- ? Use for MySQL, SQLite
 		//  - $ Use for PostgreSQL, SQLite
 		placeHolder := qb.DefaultDialect().Placeholder(1)
 
-		out := result{}
-		queryFormat := fmt.Sprintf("SELECT EXISTS(SELECT 1 FROM %s WHERE %s = %s)",
-			table, column, placeHolder)
+		// Handle different validation modes
+		if mode == "default" {
+			// Convert field value to interface{} based on type
+			val, ok := convertFieldToInterface(field)
+			if !ok {
+				return false
+			}
 
-		if err := db.Raw(queryFormat, value).First(&out); err != nil {
-			return false
+			// Single value validation
+			out, err := checkValueExists(table, column, placeHolder, val)
+			if err != nil {
+				return false
+			}
+
+			return out.Exists
+		} else {
+			// For "all" and "one" modes, we need to handle array/slice values
+			if field.Kind() != reflect.Slice && field.Kind() != reflect.Array {
+				return false // These modes only work with arrays/slices
+			}
+
+			// If array is empty, return true for "all" (all of nothing exist) and false for "one" (none exist)
+			if field.Len() == 0 {
+				return mode == "all"
+			}
+
+			// Extract values from the array/slice
+			var values []interface{}
+			for i := 0; i < field.Len(); i++ {
+				elem := field.Index(i)
+				val, ok := convertFieldToInterface(elem)
+				if !ok {
+					return false
+				}
+
+				values = append(values, val)
+			}
+
+			if mode == "all" {
+				// Check if all values exist
+				for _, val := range values {
+					out, err := checkValueExists(table, column, placeHolder, val)
+					// If any value doesn't exist, return false
+					if err != nil || !out.Exists {
+						return false
+					}
+				}
+				return true // All values exist
+			} else { // mode == "one"
+				// Check if at least one value exists
+				for _, val := range values {
+					out, err := checkValueExists(table, column, placeHolder, val)
+					if err != nil {
+						continue // Skip to next value if query fails
+					}
+
+					if out.Exists {
+						return true // If any value exists, return true
+					}
+				}
+				return false // No values exist
+			}
 		}
+	}
+}
 
-		return out.Exists
+// checkValueExists executes a query to check if a value exists in the database
+// Returns the query result and any error that occurred
+func checkValueExists(table, column, placeHolder string, val interface{}) (result, error) {
+	out := result{}
+	queryFormat := fmt.Sprintf("SELECT EXISTS(SELECT 1 FROM %s WHERE %s = %s)",
+		table, column, placeHolder)
+
+	err := db.Raw(queryFormat, val).First(&out)
+
+	return out, err
+}
+
+// convertFieldToInterface converts a reflect.Value to an interface{} based on its kind
+// Returns the converted value and a boolean indicating success
+func convertFieldToInterface(field reflect.Value) (interface{}, bool) {
+	switch field.Kind() {
+	case reflect.String:
+		return field.String(), true
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return field.Int(), true
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		return field.Uint(), true
+	case reflect.Float32, reflect.Float64:
+		return field.Float(), true
+	case reflect.Bool:
+		return field.Bool(), true
+	default:
+		return nil, false
 	}
 }

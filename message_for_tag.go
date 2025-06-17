@@ -3,6 +3,7 @@ package validation
 import (
 	"fmt"
 	"github.com/go-playground/validator/v10"
+	"strings"
 )
 
 // MsgForTagFunc Customize error fields to build messages
@@ -340,7 +341,13 @@ func MsgForTag(fe validator.FieldError) string {
 	case "country_code":
 		return "country format iso3166_1_alpha2|iso3166_1_alpha3|iso3166_1_alpha_numeric"
 	case "db_exists":
-		return fmt.Sprintf("value does not exist in `%s`", fe.Param())
+		param := fe.Param()
+		if strings.HasPrefix(param, "all:") {
+			return fmt.Sprintf("not all values exist in `%s`", param[4:])
+		} else if strings.HasPrefix(param, "one:") {
+			return fmt.Sprintf("none of the values exist in `%s`", param[4:])
+		}
+		return fmt.Sprintf("value does not exist in `%s`", param)
 	}
 
 	return fe.Error() // default error
