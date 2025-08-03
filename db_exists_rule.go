@@ -4,6 +4,7 @@ package validation
 
 import (
 	"fmt"
+	"github.com/gflydev/core/log"
 	mb "github.com/gflydev/db"
 	"github.com/go-playground/validator/v10"
 	qb "github.com/jivegroup/fluentsql"
@@ -64,16 +65,6 @@ func (v ExistsRule) Handler() validator.Func {
 		// The tag parameter: db:exists=table.column => table.column
 		param := fl.Param()
 
-		// Determine validation mode (default, all, one)
-		mode := "default"
-		if strings.HasPrefix(param, "all:") {
-			mode = "all"
-			param = param[4:] // Remove "all:" prefix
-		} else if strings.HasPrefix(param, "one:") {
-			mode = "one"
-			param = param[4:] // Remove "one:" prefix
-		}
-
 		// Parse the parameter to get table and column
 		parts := strings.Split(param, ".")
 		if len(parts) != 2 {
@@ -94,69 +85,21 @@ func (v ExistsRule) Handler() validator.Func {
 		//  - $ Use for PostgreSQL, SQLite
 		placeHolder := qb.DefaultDialect().Placeholder(1)
 
-		// Handle different validation modes
-		if mode == "default" {
-			// Convert field value to interface{} based on type
-			val, ok := convertFieldToInterface(field)
-			if !ok {
-				return false
-			}
-
-			// Single value validation
-			out, err := checkValueExists(table, column, placeHolder, val)
-			if err != nil {
-				return false
-			}
-
-			return out.Exists
-		} else {
-			// For "all" and "one" modes, we need to handle array/slice values
-			if field.Kind() != reflect.Slice && field.Kind() != reflect.Array {
-				return false // These modes only work with arrays/slices
-			}
-
-			// If array is empty, return true for "all" (all of nothing exist) and false for "one" (none exist)
-			if field.Len() == 0 {
-				return mode == "all"
-			}
-
-			// Extract values from the array/slice
-			var values []interface{}
-			for i := 0; i < field.Len(); i++ {
-				elem := field.Index(i)
-				val, ok := convertFieldToInterface(elem)
-				if !ok {
-					return false
-				}
-
-				values = append(values, val)
-			}
-
-			if mode == "all" {
-				// Check if all values exist
-				for _, val := range values {
-					out, err := checkValueExists(table, column, placeHolder, val)
-					// If any value doesn't exist, return false
-					if err != nil || !out.Exists {
-						return false
-					}
-				}
-				return true // All values exist
-			} else { // mode == "one"
-				// Check if at least one value exists
-				for _, val := range values {
-					out, err := checkValueExists(table, column, placeHolder, val)
-					if err != nil {
-						continue // Skip to next value if query fails
-					}
-
-					if out.Exists {
-						return true // If any value exists, return true
-					}
-				}
-				return false // No values exist
-			}
+		// Convert field value to interface{} based on type
+		val, ok := convertFieldToInterface(field)
+		if !ok {
+			return false
 		}
+
+		// Single value validation
+		out, err := checkValueExists(table, column, placeHolder, val)
+		if err != nil {
+			log.Tracef("db_exists_rule error: %v", err)
+
+			return false
+		}
+
+		return out.Exists
 	}
 }
 

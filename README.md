@@ -82,12 +82,10 @@ Default rules about `Database`, `Fields`, `Network`, `Strings`, `Format`, `Compa
 
 ### Database:
 
-| Tag       | Description                                                                                        |
-|-----------|----------------------------------------------------------------------------------------------------|
-| db_exists | Check single or array values is equal to a specific column in a table.                             |
-| &nbsp;    | - `validate:"db_exists=table.column"` - checks if a single value exists in the table               |
-| &nbsp;    | - `validate:"db_exists=all:table.column"` - checks if all array values exist in the table          |
-| &nbsp;    | - `validate:"db_exists=one:table.column"` - checks if at least one array value exists in the table |
+| Tag       | Description                                                                                              |
+|-----------|----------------------------------------------------------------------------------------------------------|
+| db_exists | Check single or array values is equal to a specific column in a table.                                   |
+| &nbsp;    | - `validate:"db_exists=table.column"` - checks if a single value or all array values exists in the table |
 
 ### Fields:
 
