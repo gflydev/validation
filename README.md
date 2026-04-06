@@ -1,4 +1,4 @@
-# Validation
+# gFly Validation
 
 By default, data checking is supported for structs by `Check(structData any, msgForTag MsgForTagFunc) (map[string]any, error)`
 
